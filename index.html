@@ -421,6 +421,43 @@
       color: var(--wrong-border);
     }
 
+    .answer-explanation {
+      display: grid;
+      gap: 4px;
+      margin-top: 8px;
+      padding: 10px 12px;
+      color: var(--text);
+      background: var(--option-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 10px;
+      font-size: 13px;
+      line-height: 1.5;
+      text-align: left;
+      animation: explanationIn 0.3s ease-out;
+    }
+
+    .answer-explanation[hidden] {
+      display: none;
+    }
+
+    .explanation-label {
+      color: var(--primary);
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+    }
+
+    @keyframes explanationIn {
+      from { opacity: 0; transform: translateY(5px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .answer-explanation {
+        animation: none;
+      }
+    }
+
     /* Results Screen */
     .results-screen {
       display: none;
@@ -582,7 +619,13 @@
           <!-- Rendered dynamically -->
         </div>
 
-        <div class="feedback-note" id="feedback-note"></div>
+        <div id="answer-feedback" role="status" aria-live="polite" aria-atomic="true">
+          <div class="feedback-note" id="feedback-note"></div>
+          <div class="answer-explanation" id="answer-explanation" hidden>
+            <span class="explanation-label">MISSION BRIEFING</span>
+            <span id="explanation-text"></span>
+          </div>
+        </div>
       </div>
 
       <!-- Results View -->
@@ -626,7 +669,8 @@
           "John Glenn",
           "Alan Shepard"
         ],
-        answer: 1
+        answer: 1,
+        explanation: "On April 12, 1961, Gagarin completed one orbit of Earth aboard Vostok 1, making him the first person in space."
       },
       {
         category: "Early Satellites",
@@ -637,7 +681,8 @@
           "Sputnik 1",
           "Telstar"
         ],
-        answer: 2
+        answer: 2,
+        explanation: "Sputnik 1 sent simple radio beeps from orbit for about three weeks. Its launch on October 4, 1957, began the Space Age."
       },
       {
         category: "Lunar Exploration",
@@ -648,7 +693,8 @@
           "Apollo 13",
           "Apollo 17"
         ],
-        answer: 1
+        answer: 1,
+        explanation: "Apollo 11 landed the lunar module Eagle in the Sea of Tranquility. Neil Armstrong and Buzz Aldrin explored the surface while Michael Collins orbited above."
       },
       {
         category: "Solar System",
@@ -659,7 +705,8 @@
           "Mercury",
           "Jupiter"
         ],
-        answer: 1
+        answer: 1,
+        explanation: "Olympus Mons is roughly 22 kilometers (14 miles) high. Its broad shield grew from repeated lava flows, and Mars's crust did not shift over the volcano as Earth's moving plates can."
       },
       {
         category: "Space Telescopes",
@@ -670,7 +717,8 @@
           "Spitzer Space Telescope",
           "Nancy Grace Roman Telescope"
         ],
-        answer: 0
+        answer: 0,
+        explanation: "JWST launched on December 25, 2021, and observes mostly infrared light. From near the Sun-Earth L2 point, it studies the earliest galaxies, stars, and planetary systems."
       },
       {
         category: "Deep Space",
@@ -681,7 +729,8 @@
           "Voyager 1",
           "Cassini"
         ],
-        answer: 2
+        answer: 2,
+        explanation: "Voyager 1 crossed the heliopause in 2012, entering the interstellar medium beyond the Sun's solar-wind bubble. Launched in 1977, it continues to send data from far beyond the planets."
       },
       {
         category: "Pioneers",
@@ -692,7 +741,8 @@
           "Shannon Lucid",
           "Peggy Whitson"
         ],
-        answer: 0
+        answer: 0,
+        explanation: "Sally Ride flew aboard Space Shuttle Challenger on mission STS-7 in June 1983. She was the first American woman in space."
       },
       {
         category: "Ocean Worlds",
@@ -703,7 +753,8 @@
           "Iapetus",
           "Enceladus"
         ],
-        answer: 3
+        answer: 3,
+        explanation: "NASA's Cassini spacecraft found that Enceladus's plumes contain water, ice, salts, and organic compounds. The jets emerge from fractures above a global subsurface ocean."
       },
       {
         category: "Mars Exploration",
@@ -714,7 +765,8 @@
           "Opportunity",
           "Spirit"
         ],
-        answer: 1
+        answer: 1,
+        explanation: "Perseverance landed in Jezero Crater on February 18, 2021, to study ancient rocks and collect samples. Its companion Ingenuity made the first powered flights on another planet."
       },
       {
         category: "Future Missions",
@@ -725,7 +777,8 @@
           "Constellation",
           "Gateway"
         ],
-        answer: 0
+        answer: 0,
+        explanation: "Artemis is NASA's program for returning astronauts to the Moon and building a sustained presence there. Its missions are also intended to prepare for future human exploration of Mars."
       }
     ];
 
@@ -744,6 +797,8 @@
     const progressFill = document.getElementById("progress-fill");
     const scoreText = document.getElementById("score-text");
     const feedbackNote = document.getElementById("feedback-note");
+    const answerExplanation = document.getElementById("answer-explanation");
+    const explanationText = document.getElementById("explanation-text");
     const restartBtn = document.getElementById("restart-btn");
 
     const letters = ["A", "B", "C", "D"];
@@ -760,6 +815,8 @@
       isAnsweringLocked = false;
       feedbackNote.textContent = "";
       feedbackNote.className = "feedback-note";
+      explanationText.textContent = "";
+      answerExplanation.hidden = true;
 
       const q = questions[currentQuestionIndex];
       questionCategory.textContent = q.category;
@@ -821,6 +878,9 @@
           if (correctIcon) correctIcon.textContent = "✓";
         }
       }
+
+      explanationText.textContent = q.explanation;
+      answerExplanation.hidden = false;
 
       setTimeout(() => {
         currentQuestionIndex++;
